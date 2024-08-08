@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <!-- 設定視窗的寬度和初始縮放比例 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- 設定網頁的標題 -->
+    <title>Covid-19　簡易資訊系統</title>
+
+    <!-- 連結一個名為 "style.css" 的外部樣式表 -->
+    <link rel="stylesheet" href="style.css" />
+
+    <!-- 連結 Font Awesome 圖示庫 -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.7/css/all.css" />
+</head>
+
+<body onload="countrySelect()">
+
+    <!-- 包含網頁中的元素，並以網格形式排列 -->
+    <div class="container-grid">
+
+        <div class="items item1">
+            <h4>Covid-19 簡易資訊系統</h4>
+            <select id="mySelect" class="dropdown" onchange="countrySelect()">
+          <option value="USA">美國</option>
+          <option value="Taiwan" selected>台灣</option>
+
+          <!-- 預設為台灣 -->
+          <option value="Japan">日本</option>
+          <option value="India">印度</option>
+        </select>
+        </div>
+
+        <!-- 顯示當前日期、選擇的國家和國旗圖片 -->
+        <div class="items item2">
+            <p style="font-size: 20px" id="currentDate"></p>
+            <span id="country"></span>
+            <img src="" id="flag" />
+        </div>
+
+        <!-- 顯示今日確診數 -->
+        <div class="items item3">
+
+            <!-- FontAwesome圖示庫中的圖示元素，用來顯示不同的圖示 -->
+            <i class="fas fa-arrow-alt-circle-right"></i> 今日確診：
+
+            <!-- 加圖示 -->
+            <span id="today"></span>
+        </div>
+        <div class="items item4">
+            <i class="fas fa-check-circle"></i> 今日死亡數：
+            <span id="pass"></span>
+        </div>
+        <div class="items item5">
+            <i class="fas fa-book"></i> 總個案數：
+            <span id="cases"></span>
+        </div>
+        <div class="items item6">
+            <i class="fas fa-briefcase"></i> 活躍個案數：
+            <span id="active"></span>
+        </div>
+        <div class="items item7">
+            <i class="far fa-smile"></i> 康復個案數：
+            <span id="recovered"></span>
+        </div>
+        <div class="items item8">
+            <i class="far fa-calendar-plus"></i> 已測試數：
+            <span id="tested"></span>
+        </div>
+        <div class="items item9">
+            <i class="fas fa-ambulance"></i> 總死亡數：
+            <span id="death"></span>
+        </div>
+        <div class="items item10">
+            <i class="fas fa-arrows-alt-h"></i> 死亡率：
+            <span id="rate"></span>
+        </div>
+    </div>
+</body>
+
+</html>
+
+<script type="text/javascript">
+    //抓資料
+    function countrySelect() {
+
+        // 獲取 id 為 "mySelect" 的下拉式選單的值
+        var x = document.getElementById("mySelect").value;
+
+        // 建立一個 URL 字串 link
+        var link = "https://corona.lmao.ninja/v2/countries/" + x;
+
+        // 從指定的 URL 發起一個 HTTP 請求
+        fetch(link)
+            .then((response) => {
+
+                //將回應解析為 JSON 格式的資料。
+                return response.json();
+            })
+
+        //處理 JSON 格式的資料。
+        .then((data) => {
+
+            // 取得個案數並轉換為浮點數。
+            var total = parseFloat(data.cases);
+            var pass = parseFloat(data.deaths);
+
+            // 計算死亡率並四捨五入到小數點以下第四位。
+            var rate = (pass / total).toFixed(4) * 100 + "%";
+
+            // 將從 JSON 資料中取得的各種統計數據，分別填充到網頁中指定的元素中
+            document.getElementById("country").innerHTML = data.country;
+            document.getElementById("today").innerHTML =
+                data.todayCases.toLocaleString();
+            document.getElementById("pass").innerHTML =
+                data.todayDeaths.toLocaleString();
+            document.getElementById("active").innerHTML =
+                data.active.toLocaleString();
+            document.getElementById("cases").innerHTML =
+                data.cases.toLocaleString();
+            document.getElementById("rate").innerHTML = rate;
+            document.getElementById("death").innerHTML =
+                data.deaths.toLocaleString();
+            document.getElementById("recovered").innerHTML =
+                data.recovered.toLocaleString();
+            document.getElementById("tested").innerHTML =
+                data.tests.toLocaleString();
+            document.getElementById("flag").src = data.countryInfo.flag;
+        });
+    }
+</script>
